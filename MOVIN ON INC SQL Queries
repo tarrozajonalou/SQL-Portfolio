@@ -1,54 +1,64 @@
--- List the balance due to MovinOn from each customer inclusive of moving jobs and rentals for a specific month.
+/* List the balance due to MovinOn from each customer inclusive of moving
+jobs and rentals
+for a specific month. */
 
-SELECT C.CustomerID, C.CustomerFN, C.CustomerLN, SUM(P.AmountPaid) AS BalanceDue
-FROM CUSTOMER C, PAYMENT P, RENTAL R 
+SELECT C.CustomerID, C.CustomerFN, C.CustomerLN, SUM(P.AmountPaid) AS
+BalanceDue
+FROM CUSTOMER AS C, PAYMENT AS P, RENTAL AS R
 WHERE C.CustomerID = P.PaymentID
-  AND P.PaymentID = R.RentalID
-  AND R.StartDate >= '2017-08-12'
-  AND R.ReturnDate < '2022-11-08'
+AND P.PaymentID = R.RentalID
+AND R.StartDate >= '2017-08-12'
+AND R.ReturnDate < '2022-11-08'
 GROUP BY C.CustomerID, C.CustomerFN, C.CustomerLN
 
--- 	List the amount due to each driver for moving jobs conducted in a specific month. 
+/* List the amount due to each driver for moving jobs conducted in a
+specific month.
+Be sure to consider fees that drivers are charged based on performance
+ratings. */
 
 SELECT D.DriverID, D.DriverFN, D.DriverLN,
-  SUM(CASE
-      WHEN D.Rating = 'A' THEN F.FeeAmount = 0.95
-      WHEN D.Rating = 'B' THEN F.FeeAmount = 0.90
-      ELSE F.FeeAmount = 0.85
-    END) AS Payment
-FROM DRIVER D, FEES F, JOBORDER J
+SUM(CASE
+WHEN D.Rating = 'A' THEN F.FeeAmount * 0.95
+WHEN D.Rating = 'B' THEN F.FeeAmount * 0.90
+ELSE F.FeeAmount * 0.85
+END) AS Payment
+FROM DRIVER AS D, FEES AS F, JOBORDER AS J
 WHERE D.DriverID = J.DriverID
-  AND MONTH(J.MoveDate) = 5
+AND MONTH(J.MoveDate) = 5
 GROUP BY D.DriverID, D.DriverFN, D.DriverLN;
 
--- 	List the drivers and their corresponding job details
-
-SELECT D.DriverID, D.DriverFN, D.DriverLN, JO.JobOrderID, JO.MoveDate, P.PositionID, J.Mileage, J.Weightlbs, F.FeeAmount, JO.CustomerID
-FROM DRIVER D, JOBORDER JO, JOBDETAIL J, POSITION P, FEES F
+/* List the drivers and their corresponding job details. */
+SELECT D.DriverID, D.DriverFN, D.DriverLN, JO.JobOrderID, JO.MoveDate,
+P.PositionID, J.Mileage, J.WeightLbs, F.FeeAmount, JO.CustomerID
+FROM DRIVER AS D, JOBORDER AS JO, JOBDETAIL AS J, POSITION AS P, FEES AS F
 WHERE D.DriverID = J.DriverID
-  AND JO.JobOrderID = J.JobOrderID
+AND JO.JobOrderID = J.JobOrderID
 
--- List the revenues for MovinOn in a particular month once drivers and employees have been paid out. Revenues should include both moving jobs and rentals.
-SELECT 
-  J.WarehouseID,
-  SUM(F.FeeAmount) AS Fees,
-  SUM(
-    CASE
-      WHEN R.RentalID IS NOT NULL THEN su.Rent
-      WHEN J.ServiceNeeded = 'Moving' THEN J.HeavyItems = 50
-      ELSE 0
-    END
-  ) AS Revenues 
-FROM 
-  JOBORDER J 
-  JOIN JOBDETAIL jd ON J.JobOrderID = JD.JobOrderID
-  JOIN  FEES F ON J.JobOrderID = F.JobOrderID
-  JOIN RENTAL R ON J.WarehouseID = R.WarehouseID AND J.CustomerID = R.CustomerID
-  JOIN STORAGEUNITS su ON R.UnitID = SU.UnitID
-GROUP BY 
-  J.WarehouseID;
+/* List the revenues for MovinOn in a particular month once drivers and
+employees have been
+paid out. Revenues should include both moving jobs and rentals. */
 
--- List the storage units that have not been leased and are available.
+SELECT
+J.WarehouseID,
+SUM(F.FeeAmount) AS Fees,
+SUM(
+CASE
+WHEN R.RentalID IS NOT NULL THEN su.Rent
+WHEN J.ServiceNeeded = 'Moving' THEN J.HeavyItems * 50
+ELSE 0
+END
+) AS Revenues
+FROM
+JOBORDER AS J
+JOIN JOBDETAIL JD ON J.JobOrderID = JD.JobOrderID
+JOIN FEES F ON J.JobOrderID = F.JobOrderID
+JOIN RENTAL R ON J.WarehouseID = R.WarehouseID AND J.CustomerID =
+R.CustomerID
+JOIN STORAGEUNITS su ON R.UnitID = SU.UnitID
+GROUP BY
+J.WarehouseID;
+
+/* List the storage units that have not been leased and are available. */
 
 SELECT UnitID, UnitSize
 FROM STORAGEUNITS
