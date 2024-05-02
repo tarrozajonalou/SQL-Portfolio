@@ -1,0 +1,524 @@
+*** CREATE TABLE SYNTAX ***
+
+USE MOVINGONINC;
+
+CREATE TABLE POSITION (
+	PositionID Int NOT NULL, 
+	Title Char(50) NOT NULL, 
+	CONSTRAINT POSITION_PK PRIMARY KEY(PositionID)
+	);
+
+CREATE TABLE WAREHOUSE ( 
+	WarehouseID Int NOT NULL, 
+	WarehouseName Char(50) NOT NULL, 
+	Address Char(100) NOT NULL,
+	City Char(50) NOT NULL,
+	State Char(2) NOT NULL,
+	Zip Int NOT NULL,
+	Phone Int NOT NULL,
+	ClimateControl Char(3) NOT NULL, 
+	SecurityGate Char(3) NOT NULL,
+	CONSTRAINT WAREHOUSE_PK PRIMARY KEY(WarehouseID),
+	);
+
+CREATE TABLE EMPLOYEE ( 
+	EmployeeID Int NOT NULL, 
+	EmployeeFN Char(50) NOT NULL,
+	EmployeeLN Char(50) NOT NULL,
+	PositionID Int NOT NULL,
+	WarehouseID Int NOT NULL,
+	Email Char(100) NOT NULL, 
+	Phone Int NOT NULL, 
+	CellPhone Int NOT NULL, 
+	Address Char(50) NOT NULL, 
+	City Char(50) NOT NULL,
+	State Char(2) NOT NULL,
+	Zip Int NOT NULL,
+	SSN Int NOT NULL, 
+	DOB Date NOT NULL, 
+	HireDate Date NOT NULL,
+	TermDate Date, 
+	Salary Int, 
+	HourlyRate Int, 
+	ReviewDate Date, 
+	Notes Char(100),
+	CONSTRAINT EMPLOYEE_PK PRIMARY KEY(EmployeeID),
+	CONSTRAINT EMPLOY_POSITIONID_FK FOREIGN KEY(PositionID) REFERENCES POSITION (PositionID),
+	CONSTRAINT EMPLOY_WAREHOUSEID_FK FOREIGN KEY(WarehouseID) REFERENCES WAREHOUSE (WarehouseID)
+	);
+
+CREATE TABLE DRIVER ( 
+	DriverID Int NOT NULL,
+	DriverFN Char(50) NOT NULL, 
+	DriverLN Char(50) NOT NULL, 
+	DriverAddress Char(50) NOT NULL,
+	DriverCity Char(50) NOT NULL,
+	DriverState Char(2) NOT NULL,
+	DriverZip Int NOT NULL,
+	SSN Int NOT NULL,
+	DOB Date NOT NULL,
+	BeginDate Date NOT NULL,
+	EndDate Date,
+	Email Char(100) NOT NULL,
+	Age Int NOT NULL,
+	Phone Int NOT NULL, 
+	Rating Char(1) NOT NULL,
+	MilesDriven Int NOT NULL,
+	TotalEarnings Int NOT NULL,
+	CONSTRAINT DRIVER_PK PRIMARY KEY(DriverID),
+	);
+
+CREATE TABLE CUSTOMER ( 
+	CustomerID Int NOT NULL,
+	CustomerFN Char(100) NOT NULL,
+	CustomerLN Char(100) NOT NULL,
+	Address Int NOT NULL,
+	City Char(50) NOT NULL, 
+	State Char(2) NOT NULL,
+	Zip Int NOT NULL,
+	Email Char(100) NOT NULL,
+	Phone Int NOT NULL,
+	CONSTRAINT CUSTOMER_PK PRIMARY KEY(CustomerID) 
+	);
+
+CREATE TABLE STORAGEUNITS ( 
+	UnitID Int NOT NULL,
+	CustomerID Int NOT NULL, 
+	WarehouseID Int NOT NULL, 
+	UnitSize Int NOT NULL,
+	Rent Int NOT NULL,
+	UnitStatus Int NOT NULL,
+	CONSTRAINT STORAGEUNITS_PK PRIMARY KEY(UnitID), 
+	CONSTRAINT STOR_CUSTOMERID_FK FOREIGN KEY(CustomerID) REFERENCES CUSTOMER (CustomerID),
+	CONSTRAINT STOR_WAREHOUSEID_FK FOREIGN KEY(WarehouseID) REFERENCES WAREHOUSE (WarehouseID)
+	);
+
+
+CREATE TABLE CUSTOMERREQUEST ( 
+	RequestID Int NOT NULL,
+	CustomerID Int NOT NULL, 
+	RequestDate Date NOT NULL, 
+	RequestedService Char(50) NOT NULL,
+	AdditionalInfo Char(50) NOT NULL,
+	CONSTRAINT CUSTOMERREQUEST_PK PRIMARY KEY(RequestID),
+	CONSTRAINT CUSTREQ_CUSTOMERID_FK FOREIGN KEY (CustomerID) REFERENCES CUSTOMER (CustomerID),
+	);
+
+CREATE TABLE VEHICLETYPE ( 
+	VehicleTypeID Int NOT NULL,
+	LicensePlate Int NOT NULL, 
+	Axles Int NOT NULL, 
+	Color Char(20) NOT NULL,
+	Stored Char(3) NOT NULL,
+	CONSTRAINT VEHICLTYPE_PK PRIMARY KEY(VehicleTypeID), 
+	);
+
+CREATE TABLE VEHICLE ( 
+	VehicleID Int NOT NULL,
+	VehicleTypeID Int NOT NULL, 
+	CONSTRAINT VEHICLE_PK PRIMARY KEY(VehicleID), 
+	CONSTRAINT VEHICLE_VEHICLETYPEID_FK FOREIGN KEY(VehicleTypeID) REFERENCES VEHICLETYPE (VehicleTypeID)
+	);
+
+CREATE TABLE JOBSTATUS ( 
+	StatusID Int NOT NULL, 
+	StatusName Char(20) NOT NULL, 
+	CONSTRAINT JOBSTATUS_PK PRIMARY KEY(StatusID)
+	);
+
+CREATE TABLE JOBORDER ( 
+	JobOrderID Int NOT NULL,
+	CustomerID Int NOT NULL,
+	VehicleID Int NOT NULL, 
+	DriverID Int NOT NULL, 
+	MoveDate Date NOT NULL,
+	WarehouseID Int NOT NULL,
+	StatusID Int NOT NULL,
+	AddressFr Char(50) NOT NULL, 
+	CityFr Char(50) NOT NULL, 
+	StateFr Char(2) NOT NULL, 
+	AddressTo Char(50) NOT NULL,
+	CityTo Char(50) NOT NULL, 
+	StateTo Char(2) NOT NULL,
+	ServiceNeeded Char(3) NOT NULL,
+	HeavyItems Char(3) NOT NULL,
+	StoreItem Char(3) NOT NULL,
+	CONSTRAINT JOBORDER_PK PRIMARY KEY(JobOrderID),
+	CONSTRAINT JOBORDER_CUSTOMERID_FK FOREIGN KEY (CustomerID) REFERENCES CUSTOMER (CustomerID),
+	CONSTRAINT JOBORDER_VEHICLEID_FK FOREIGN KEY (VehicleID) REFERENCES VEHICLE (VehicleID), 
+	CONSTRAINT JOBORDER_DRIVERID_FK FOREIGN KEY (DriverID) REFERENCES DRIVER (DriverID), 
+	CONSTRAINT JOBORDER_WAREHOUSEID_FK FOREIGN KEY (WarehouseID) REFERENCES WAREHOUSE (WarehouseID), 
+	CONSTRAINT JOBORDER_STATUSID_FK FOREIGN KEY (StatusID) REFERENCES JOBSTATUS (StatusID) 
+	);
+
+CREATE TABLE JOBDETAIL ( 
+	JobDetailID Int NOT NULL,
+	JobOrderID Int NOT NULL,
+	DriverID Int NOT NULL, 
+	VehicleID Int NOT NULL, 
+	Mileage Int NOT NULL,
+	Weight Int NOT NULL,
+	CONSTRAINT JOBDETAIL_PK PRIMARY KEY(JobDetailID),
+	CONSTRAINT JOBDETAIL_JOBORDERID_FK FOREIGN KEY (JobOrderID) REFERENCES JOBORDER (JobOrderID),
+	CONSTRAINT JOBDETAIL_DRIVERID_FK FOREIGN KEY (DriverID) REFERENCES DRIVER (DriverID), 
+	CONSTRAINT JOBDETAIL_VEHICLEID_FK FOREIGN KEY (VehicleID) REFERENCES VEHICLE (VehicleID)
+	);
+
+
+
+CREATE TABLE FEES ( 
+	FeeID Int NOT NULL,
+	JobOrderID Int NOT NULL, 
+	FeeDescription Int NOT NULL, 
+	FeeAmount Int NOT NULL,
+	CONSTRAINT FEES_PK PRIMARY KEY(FeeID), 
+	CONSTRAINT FEES_JOBORDERID_FK FOREIGN KEY(JobOrderID) REFERENCES JOBORDER (JobOrderID)
+	);
+
+CREATE TABLE RENTAL ( 
+	RentalID Int NOT NULL,
+	CustomerID Int NOT NULL, 
+	WarehouseID Int NOT NULL, 
+	UnitID Int NOT NULL,
+	StartDate Date NOT NULL,
+	EndDate Date,
+	CONSTRAINT RENTAL_PK PRIMARY KEY(RentalID), 
+	CONSTRAINT RENTAL_CUSTOMERID_FK FOREIGN KEY(CustomerID) REFERENCES CUSTOMER (CustomerID),
+	CONSTRAINT RENTAL_WAREHOUSEID_FK FOREIGN KEY(WarehouseID) REFERENCES WAREHOUSE (WarehouseID),
+	CONSTRAINT RENTAL_UNITID_FK FOREIGN KEY(UnitID) REFERENCES STORAGEUNITS (UnitID)
+	);
+
+CREATE TABLE INVOICE ( 
+	InvoiceID Int NOT NULL, 
+	JobOrderID Int NOT NULL, 
+	TotalCost Int NOT NULL, 
+	CONSTRAINT INVOICE_PK PRIMARY KEY(InvoiceID),
+	CONSTRAINT INVOICE_JOBORDERID_FK FOREIGN KEY(JobOrderID) REFERENCES JOBORDER (JobOrderID)
+	);
+
+CREATE TABLE PAYMENT ( 
+	PaymentID Int NOT NULL, 
+	InvoiceID Int NOT NULL, 
+	DatePaid Int NOT NULL,
+AmountPaid INT NOT NULL,  
+	CONSTRAINT PAYMENT_PK PRIMARY KEY(PaymentID),
+	CONSTRAINT PAYMENT_INVOICEID_FK FOREIGN KEY(InvoiceID) REFERENCES INVOICE (InvoiceID)
+	);
+
+*** INSERT DATA SYNTAX ***
+USE MOVINGONINC;
+
+/*****   EMPLOYEE DATA   ******************************************************/
+
+INSERT INTO EMPLOYEE (EmployeeID, EmployeeFN, EmployeeLN, PositionID, WarehouseID, Email, Phone, CellPhone, Address, City, State, Zip, SSN, DOB, HireDate, TermDate, Salary, HourlyRate, ReviewDate, Notes)
+	VALUES('1001', 'David', 'Bowers', '1', 'CA-1', 'david.bowers@movinoninc.com', '(206) 246-5132', '(206) 555-1234', '10124 Metropolitan Drive', 'Seattle', 'WA', '98117', '154-00-3785', '9/12/1958', '1/22/1998', 'NULL', '72,000', 'NULL', 'NULL','NULL');
+INSERT INTO EMPLOYEE VALUES ('1002', 'Elena', 'Martinez', '2', 'NV-1', 'elena_martinez@movinoninc.com', '(206)963-8520', '(206) 396-2580', '1234 Pine St', 'Seattle', 'WA', '98101', '587-67-3421', '10/24/1989', '10/23/2015', '12/31/2020', 'NULL', '25', '02/07/2015', 'Consistent work');
+INSERT INTO EMPLOYEE VALUES ('1003', 'Marcus', 'Wong', '3', 'AZ-1', 'm.wong@movinoninc.com', '(206)741-8529', '(206) 471-8925', '5678 1st Ave', 'Seattle', 'WA', '98121', '324-84-9076', '06/11/1994', '05/12/2016', '06/30/2021', 'NULL', '20', 'NULL', 'NULL');
+INSERT INTO EMPLOYEE VALUES ('1004', 'Jasmine', 'Patel', '12', 'CA-1', 'patel_jasmine@movinoninc.com', '(555)852-7412', '(555)258-2147', '1234 Main St', 'Phoenix', 'AZ', '85001', '998-46-2210', '08/02/1987', '08/05/2018', 'NULL', '65,000', 'NULL', 'NULL', 'Works well with others');
+INSERT INTO EMPLOYEE VALUES ('1005', 'Nathaniel', 'Davis', '4', 'NV-1', 'n.davis@movinoninc.com', '(555)963-7410', '(555)749-6310', '5678 Elm St', 'Tucson', 'AZ', '85701', '772-91-5209', '03/17/1992', '02/14/2017', '10/19/2022', '75,000', 'NULL', '12/21/2017', 'Great growth');
+INSERT INTO EMPLOYEE VALUES ('1006', 'Chloe', 'Lee', '5', 'AZ-1', 'chloelee@movinoninc.com', '(555)398-3657', '(555)789-3365', '9012 Oak St', 'Mesa', 'AZ', '85201', '629-30-1864', '11/29/1990', '06/29/2019', 'NULL', 'NULL', '18', 'NULL', 'NULL');
+INSERT INTO EMPLOYEE VALUES ('1007', 'Christopher', 'Garcia', '13', 'CA-1', 'chris_garcia@movinoninc.com', '(702)763-8722', '(702)637-7282', '123 Main St', 'Las Vegas', 'NV', '89101', '460-55-7998', '07/08/1985', '09/01/2016', '03/31/2021', 'NULL', '22', 'NULL', 'NULL');
+INSERT INTO EMPLOYEE VALUES ('1008', 'Natalie', 'Nguyen', '6', 'NV-1', 'nnguyen@movinoninc.com', '(775)350-8206', '(775)503-6028', '456 Oak Ave', 'Reno', 'NV', '89501', '176-83-6329', '01/22/1998', '12/12/2015', '06/14/2020', 'NULL', '15', '11/11/2019', 'Strong work ethic');
+INSERT INTO EMPLOYEE VALUES ('1009', 'Grace', 'Wright', '7', 'AZ-1', 'gracewright@movinoninc.com', '(702)459-8836', '(702)495–1230', '789 Elm St', 'Henderson', 'NV', '89002', '305-36-0675', '05/06/1991', '07/18/2016', '03/31/2021', '90,000', 'NULL', 'NULL', 'NULL');
+INSERT INTO EMPLOYEE VALUES ('1010', 'Jimin', 'Park', '14', 'CA-1', 'jiminpark@movinoninc.com', '(213)578-3455', '(213)748-3444', '123 Main St', 'Los Angeles', 'CA', '90001', '743-20-4687', '10/13/1995', '04/05/2018', 'NULL', 'NULL', '16', 'NULL', 'Has positive attitude');
+INSERT INTO EMPLOYEE VALUES ('1011', 'Yeonjun', 'Choi', '8', 'NV-1', 'choi.yeonjun@movinoninc.com', '(415)267-9932', '(415)217-8832', '123 Oak Ave', 'San Francisco', 'CA', '94110', '912-68-1303’, ‘09/13/1999', '11/09/2023', 'NULL', 'NULL', '14', 'NULL', 'NULL', 'NULL');
+INSERT INTO EMPLOYEE VALUES ('1012', 'Wonwoo', 'Jeon', '9', 'AZ-1', 'j_wonwoo@movinoninc.com', '(916)213-3248', '(916)267-3248', '456 Elm St', 'Sacramento', 'CA', '95814', '547-41-2896', '07/17/1996', '03/22/2017', '03/21/2023', 'NULL', '20', 'NULL', 'NULL');
+INSERT INTO EMPLOYEE VALUES ('1013', 'Mingyu', 'Lee', '10', 'CA-1', 'lee_mingyu@movinoninc.com', '(619)814-6636', '(619)418-6727', '7891 Pine St', 'San Diego', 'A', '92103', '681-11-8340', '04/06/1997', '01/16/2015', 'NULL', 'NULL', '18', 'NULL', 'Great problem-solver');
+INSERT INTO EMPLOYEE VALUES ('1014', 'Olivia', 'Adams', '15', 'NV-1', 'oli_adams@movinoninc.com', '(555)714-5503', '(555)814-6636', '213 Main St', 'Seattle', 'WA', '98101', '239-75-1958', '11/09/1999', '10/02/2019', 'NULL', '90,000', 'NULL', '07/30/2020', 'NULL');
+INSERT INTO EMPLOYEE VALUES ('1015', 'Mia', 'Brown', '11', 'AZ-1', 'mia.brown@movinoninc.com', '(555)914-0814', '(555)702-5503', '123 Pine St', 'Tacoma', 'WA', '98402', '401-59-0321', '06/29/1986', '08/28/2016', '07/30/2021', '60,000', 'NULL', 'NULL', 'NULL');
+
+/*****  POSITION DATA   ********************************************************/
+
+INSERT INTO POSITION (PositionID, Title)
+	VALUES(1, 'General Manager');
+INSERT INTO POSITION VALUES(2, 'Warehouse Manager');
+INSERT INTO POSITION VALUES(3, 'Administrative Assistant');
+INSERT INTO POSITION VALUES(4, 'Accountant');
+INSERT INTO POSITION VALUES(5, 'Maintenance');
+INSERT INTO POSITION VALUES(6, 'Moving Assistant');
+INSERT INTO POSITION VALUES(7, 'Information Systems');
+INSERT INTO POSITION VALUES(8, 'Operations Manager');
+INSERT INTO POSITION VALUES(9, 'Dispatch Coordinator');
+INSERT INTO POSITION VALUES(10, 'Customer Service');
+INSERT INTO POSITION VALUES(11, 'Store Manager');
+INSERT INTO POSITION VALUES(12, 'Sales Representative');
+INSERT INTO POSITION VALUES(13, 'Moving Consultant');
+INSERT INTO POSITION VALUES(14, 'Warehouse Associate');
+INSERT INTO POSITION VALUES(15, 'Marketing Manager');
+
+	
+/*****   WAREHOUSE DATA   *********************************************************/
+
+INSERT INTO WAREHOUSE (WarehouseID, WarehouseName, Address, City, State, Zip, Phone, ClimateControl, SecurityGate)			
+	VALUES('CA-1', 'MovingON California', '#3 Industrial Park Way', 'Fullerton', 'CA', '90621', '6572783721', 'Yes', 'Yes');
+INSERT INTO WAREHOUSE VALUES('NV-1', 'MovingOn Nevada', '8798 Warehouse Rd', 'Las Vegas', 'NV', '89104', '7024568734', 'No', 'Yes');
+INSERT INTO WAREHOUSE VALUES('AZ-1', 'MovingOn Arizona', '54781 Hixson Pike', 'Phoenix', 'AZ', '85005', '6238972341', 'Yes', 'No');
+
+/********  DRIVER DATA  **********************************************************/
+
+INSERT INTO DRIVER (DriverID, DriverFN, DriverLN, DriverAddress, DriverCity, DriverState, DriverZip, SSN, DOB, BeginDate, EndDate, Email, Phone, Rating, MilesDriven, TotalEarnings)
+	VALUES('201', 'Sarah', 'George', '1234 Main St', 'Phoenix', 'AZ', '85001', '135-23-0987', '06/17/1992', '10/23/2015', 'NULL', 'sarahgeorge@movinoninc.com', '(602)683-5428', 'A', '867.2', '82869.60');
+INSERT INTO DRIVER VALUES('202', 'Michael', 'Thompson', '5678 Elm St', 'San Francisco', 'CA', '94109', '123-45-6789', '11/23/1985', '10/23/2015', '12/31/2020', 'm_thompson@movinoninc.com', '(415)326-9147', 'B', '392.1', '1739.20');
+INSERT INTO DRIVER VALUES('203', 'Ashley', 'Lee', '9101 Olive Ave', 'Las Vegas', 'NV', '89145', '012-78-4561', '09/12/1987', '05/12/2016', '06/30/2021', 'ashley.lee@movinoninc.com', '(702)536-8719', 'C', '120.5', '1482.90');
+INSERT INTO DRIVER VALUES('204', 'Daniel', 'Davis', '2468 Maple Dr', 'Scottsdale', 'AZ', '85250', '963-56-7894', '03/08/1990', '08/05/2018', 'NULL', 'dan_davis@movinoninc.com', '(480)257-1890', 'D', '63.8', '1209.40');
+INSERT INTO DRIVER VALUES('205', 'Emily', 'Rodriguez', '1234 Pine St', 'Los Angeles', 'CA', '90028', '012-95-7530', '05/29/1993', '02/14/2017', '10/19/2022', 'em.rod@movinoninc.com', '(213)489-6837', 'F', '25.6', '32.50');
+INSERT INTO DRIVER VALUES('206', 'Jacob', 'Johnson', '1357 Cedar Ave', 'Reno', 'NV', '89501', '843-08-9126', '07/14/1988', '06/29/2019', '03/31/2021', 'jacon_john@movinoninc.com', '(775)674-8426', 'F', '56.3', '935.10');
+INSERT INTO DRIVER VALUES('207', 'Kim', 'Jackson', '3698 Oak St', 'Tucson', 'AZ', '85701', '333-78-4198', '02/03/1995', '09/01/2016', '03/31/2021', 'kimjackson@movinoninc.com', '(520)662-9572', 'D', '178.9', '1246.70');
+INSERT INTO DRIVER VALUES('208', 'Samantha', 'Park', '7531 Walnut Dr', 'San Diego', 'CA', '92103', '697-00-4561', '12/19/1986', '12/12/2015', '06/14/2020', 'park_samantha@movinoninc.com', '(619)467-9215', 'C', '429.6', '1573.70');
+INSERT INTO DRIVER VALUES('209', 'Isabella', 'Hernandez', '9512 Birch Ave', 'Henderson', 'NV', '89011', '986-00-7894', '08/01/1991', '07/18/2016', 'NULL', 'isabella_hernandez@movinoninc.com', '(702)560-3892', 'B', '732.0', '1943.20');
+INSERT INTO DRIVER VALUES('210', 'Scott', 'Michael', '8642 Cedar St', 'Mesa', 'AZ', '85203', '317-99-1287', '10/07/1994', '04/05/2018', 'NULL', 'scott.michael@movinoninc.com', '(480)941-2873', 'A', '985.4', '3195.40');
+INSERT INTO DRIVER VALUES('211', 'Michael', 'Lee', '1111 Orange Ave', 'San Jose', 'CA', '95128', '991-44-7365', '01/22/1989', '11/09/2023', 'NULL', 'lee_michael@movinoninc.com', '(408)409-7653', 'A', '624.9', '2650.80');
+INSERT INTO DRIVER VALUES('212', 'Benjamin', 'Frank', '4444 Redwood Dr', 'North Las Vegas', 'NV', '89031', '882-44-6636', '04/11/1996', '03/22/2017', 'NULL', 'frank.benj@movinoninc.com', '(702) 534-9681', 'F', '55.9', '868.90');
+INSERT INTO DRIVER VALUES('213', 'Charlie', 'Brown', '1233 Pine St', 'Flagstaff', 'AZ', '96001', '982-03-7269', '08/28/1999', '01/16/2015', 'NULL', 'charlie_brown@movinoninc.com', '(928)226-7832', 'C', '291.7', '1560.60');
+INSERT INTO DRIVER VALUES('214', 'Ava', 'Max', '7891 Laurel Ave', 'Sacramento', 'CA', '95814', '157-15-9614', '06/02/1997', '10/02/2019', '03/21/2023', 'ava.max@movinoninc.com', '(916)671-3485', 'A', '572.9', '2227.80');
+INSERT INTO DRIVER VALUES('215', 'Kate', 'Thomas', '5555 Oakwood Dr', 'Sparks', 'NV', '89436', '012-22-5578', '09/15/1998', '08/28/2016', '07/30/2021', 'kate_thomas@movinoninc.com', '(775)354-6839', 'A', '562.8', '2087.30');
+
+
+/******** STORAGEUNITS DATA   **********************************************************/
+
+INSERT INTO STORAGEUNITS (UnitID, CustomerID, WarehouseID, UnitSize, Rent, UnitStatus)
+	VALUES(1, 'CA-1', '8 x 8', 25.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(1, 'NV-1', '12 x 12', 35.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(1, 'AZ-1', '12 x 12', 45.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(2, 'CA-1', '8 x 8', 30.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(2, 'NV-1', '12 x 12', 35.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(2, 'AZ-1', '12 x 12', 45.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(3, 'CA-1', '8 x 8', 25.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(3, 'NV-1', '9 x 12', 30.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(3, 'AZ-1', '12 x 12', 45.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(4, 'CA-1', '8 x 12', 30.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(4, 'NV-1', '9 × 12', 30.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(4, 'AZ-1', '12 x 18', 70.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(5, 'CA-1', '8 x 8', 25.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(5, 'NV-1', '12 x 12', 85.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(5, 'AZ-1', '12 × 18', 70.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(6, 'CA-1', '8 × 12', 30.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(6, 'NV-1', '12 x 12', 85.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(6, 'AZ-1', '12 x 12', 45.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(7, 'CA-1', '8 × 10', 25.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(7, 'NV-1', '12 × 10', 80.00, 'Occupied');
+INSERT INTO STORAGEUNITS VALUES(7, 'AZ-1', '12 x12', 85.00, 'Available');
+INSERT INTO STORAGEUNITS VALUES(8, 'CA-1', '15 x 15', 95.00, 'Occupied');
+
+
+/*********  CUSTOMER DATA   ***************************************************************/
+
+INSERT INTO CUSTOMER (CustomerID, CustomerFN, CustomerLN, Address, City, State, Zip, Email, Phone)
+	VALUES(87002, 'Piazza', 'Real Estate', '1789 Eighth Avenue', 'Spokane', 'WA', '98117', 'piazza.realestate@gmail.com', '(206) 123-0123');
+INSERT INTO CUSTOMER VALUES(24601, 'Jenny', 'Kim', '1234 Vineyard Ave', 'Sacramento', 'CA', '95829', 'jenny.kim@gmail.com', '(916) 555-0101');
+INSERT INTO CUSTOMER VALUES(93752, 'Mark', 'Lee', '1234 Sunset Rd', 'Henderson', 'NV', '89014', 'mark_lee@gmail.com', '(702) 555-0123');
+INSERT INTO CUSTOMER VALUES(18594, 'Justin', 'Grace', '1234 Camelback Rd', 'Phoenix', 'AZ', '85018', 'justin.grace@yahoo.com', '(480) 555-0180');
+INSERT INTO CUSTOMER VALUES(71985, 'Selena', 'Baldwin', '7892 Las Vegas Blvd', 'Las Vegas', 'NV', '89109', 'selena.balwin432@yahoo.com', '(702) 555-0123');
+INSERT INTO CUSTOMER VALUES(37281, 'Chloe', 'Bram', '5678 University Blvd', 'Tucson', 'AZ', '85705', 'chloe_bram@gmail.com', '(520) 555-0505');
+INSERT INTO CUSTOMER VALUES(68543, 'Johnny', 'Monet', '135 Pacific Coast Highway', 'Malibu', 'CA', '90265', 'johnnymonet@gmail.com', '(310) 555-1212');
+INSERT INTO CUSTOMER VALUES(25714, 'Ben', 'Choi', '1357 Silverado Ranch Blvd', 'Enterprise', 'NV', '89123', 'benchoi@gmail.com', '(702) 555-0123');
+INSERT INTO CUSTOMER VALUES(89372, 'Terry', 'Kai', '135 Shea Blvd', 'Scottsdale', 'AZ', '85260', 'terry.kai@gmail.com', '(480) 555-2600');
+INSERT INTO CUSTOMER VALUES(62349, 'Steve', 'Moi', '2468 Magnolia Blvd', 'Burbank', 'CA', '91505', 'steve_choi@gmail.com', '(818) 555-1717');
+INSERT INTO CUSTOMER VALUES(48197, 'Daniel', 'Park', '2568 Silverado Ranch Blvd', 'Enterprise', 'NV', '89123', 'daniel.park@gmail.com', '(702) 555-4567');
+INSERT INTO CUSTOMER VALUES(75923, 'Louis', 'Brawn', '246 Gilbert Rd', 'Mesa', 'AZ', '85204', 'louis_brawn@gmail.com', '(480) 555-2040');
+INSERT INTO CUSTOMER VALUES(38957, 'Angelica', 'Marie', '4568 Rodeo Drive', 'Beverly Hills', 'CA', '90210', 'angelica.marie@gmail.com', '(310) 555-2222');
+INSERT INTO CUSTOMER VALUES(92754, 'Kenneth', 'Tan', '4568 South McCarran Blvd', 'Sparks', 'NV', '89431', 'kenneth_tan@gmail.com', '(775) 555-0123');
+INSERT INTO CUSTOMER VALUES(57219, 'Lance', 'Maine', '456 Beaver St', 'Flagstaff', 'AZ', '86001', 'lancemaine@gmail.com', '(928) 555-0101');
+
+/*********  CUSTOMERREQUEST DATA   ***************************************************************/
+
+INSERT INTO CUSTOMERREQUEST (RequestID, CustomerID, RequestDate, RequestedService, AdditionalInfo)
+	VALUES('REQ12345', '87002', '2019-09-24', 'Moving Service', '10 ft moving truck');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ23456', '24601', '2017-03-02', 'Storage Service', 'Store belongings in 1 month');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ34567', '93752', '2020-05-18', 'Both', '15 ft moving truck, store belongings in 2 months');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ45678', '18594', '2016-07-12', 'Moving Service', '15 ft moving truck');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ56789', '71985', '2021-11-20', 'Storage Service', 'Store belongings in span of 4 months');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ67890', '37281', '2015-12-09', 'Both', '20 ft moving truck, store in one week');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ78901', '68543', '2018-08-31', 'Moving Service', '25 ft moving truck');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ89012', '25714', '2022-02-17', 'Storage Service', 'Store based off fragility');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ90123', '89372', '2017-06-08', 'Both', 'Store and move based off fragility');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ01234', '62349', '2023-01-25', 'Moving Service', '25 ft moving truck');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ09876', '48197', '2016-04-09', 'Storage Service', 'Store belongings in span of 4 months');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ98765', '75923', '2022-10-05', 'Both', 'Store and move based off fragility');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ87654', '38957', '2019-07-23', 'Moving Service', '15 ft moving truck');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ76543', '92754', '2021-09-01', 'Storage Service', 'Store belongings in 1 month');
+INSERT INTO CUSTOMERREQUEST VALUES('REQ65432', '57219', '2015-12-30', 'Both', 'Store and move based off fragility');
+
+
+
+
+/*********  JOBDETAIL DATA   ***************************************************************/
+
+INSERT INTO JOBDETAIL (JobDetailID, JobOrderID, DriverID, VehicleID, Mileage, Weight)
+	VALUES(34562, 'J-98765', 201, 'VEH1057', '5 miles', '100 lbs');
+INSERT INTO JOBDETAIL VALUES(87391, 'J-54321', 202, 'VEH2096', '10 miles', '250 lbs');
+INSERT INTO JOBDETAIL VALUES(21904, 'J-24680', 203, 'VEH3145', '15 miles', '500 lbs');
+INSERT INTO JOBDETAIL VALUES(98271, 'J-13579', 204, 'VEH4163', '20 miles', '750 lbs');
+INSERT INTO JOBDETAIL VALUES(65712, 'J-24601', 205, 'VEH5218', '25 miles', '1000 lbs');
+INSERT INTO JOBDETAIL VALUES(42658, 'J-12345', 206, 'VEH6372', '30 miles', '1250 lbs');
+INSERT INTO JOBDETAIL VALUES(75413, 'J-9876', 207, 'VEH7458', '35 miles', '1500 lbs');
+INSERT INTO JOBDETAIL VALUES(19083, 'J-5432', 208, 'VEH8489', '40 miles', '1750 lbs');
+INSERT INTO JOBDETAIL VALUES(36571, 'J-2468', 209, 'VEH9510', '45 miles', '2000 lbs');
+INSERT INTO JOBDETAIL VALUES(58321, 'J-1357', 210, 'VEH0621', '50 miles', '2250 lbs');
+INSERT INTO JOBDETAIL VALUES(82091, 'J-2460', 211, 'VEH1789', '55 miles', '2500 lbs');
+INSERT INTO JOBDETAIL VALUES(10957, 'J-1234', 212, 'VEH2815', '60 miles', '2750 lbs');
+INSERT INTO JOBDETAIL VALUES(65023, 'J-8765', 213, 'VEH3970', '65 miles', '3000 lbs');
+INSERT INTO JOBDETAIL VALUES(94281, 'J-4321', 214, 'VEH4945', '70 miles', '3250 lbs');
+INSERT INTO JOBDETAIL VALUES(23789, 'J-8024', 215, 'VEH5987', '75 miles', '3500 lbs');
+
+
+
+/*********  JOBORDER DATA   ***************************************************************/
+
+INSERT INTO JOBORDER (JobOrderID, CustomerID, VehicleID, DriverID, MoveDate, WarehouseID, StatusID, AddressFr, CityFr, StateFr, AddressTo, CityTo, StateTo, ServiceNeeded, HeavyItems, StoreItem)
+	VALUES('J-98765', 87002, 'VEH1057', 201, '2017-09-15', 'CA-1', 101, '123 Main St', 'Phoenix', 'AZ', '1234 Main St', 'Los Angeles', 'CA', 'Moving Service', 'Yes', 'No');
+INSERT INTO JOBORDER VALUES('J-54321', 24601, 'VEH2096', 202, '2019-07-20', 'NV-1', 205, '1234 Main St', 'Los Angeles', 'CA', '1234 Silver St', 'Las Vegas', 'NV', 'Storage Service', 'No', 'Yes');
+INSERT INTO JOBORDER VALUES('J-24680', 93752, 'VEH3145', 203, '2017-05-03', 'AZ-1', 312, '123 Nevada Way', 'Las Vegas', 'NV', '1212 Pine St', 'Mesa', 'AZ', 'Both', 'Yes', 'Yes');
+INSERT INTO JOBORDER VALUES('J-13579', 18594, 'VEH4163', 204, '2018-11-18', 'CA-1', 422, '456 Maple Ave', 'Scottsdale', 'AZ', '1414 Pine St', 'Sacramento', 'CA', 'Moving Service', 'Yes', 'No');
+INSERT INTO JOBORDER VALUES('J-24601', 71985, 'VEH5218', 205, '2022-02-22', 'NV-1', 507, '456 Silver St', 'Reno', 'NV', '5678 Gold Ave', 'Reno', 'NV', 'Storage Service', 'No', 'Yes');
+INSERT INTO JOBORDER VALUES('J-12345', 37281, 'VEH6372', 206, '2016-09-14', 'AZ-1', 613, '5678 Maple Ave', 'San Francisco', 'CA', '1234 Main St', 'Phoenix', 'AZ', 'Both', 'Yes', 'Yes');
+INSERT INTO JOBORDER VALUES('J-9876', 68543, 'VEH7458', 207, '2015-08-05', 'CA-1', 723, '789 Oak St', 'Tucson', 'AZ', '1234 Vine St', 'Los Angeles', 'CA', 'Moving Service', 'Yes', 'No');
+INSERT INTO JOBORDER VALUES('J-5432', 25714, 'VEH8489', 208, '2023-12-01', 'NV-1', 801, '1010 Elm St', 'Flagstaff', 'NV', '9101 Platinum Dr', 'Mesa', 'NV', 'Storage Service', 'No', 'Yes');
+INSERT INTO JOBORDER VALUES('J-2468', 89372, 'VEH0621', 209, '06/27/2020', 'AZ-1', 916, '111 First Ave', 'Seattle', 'WA', '5678 Elm St', 'Tucson', 'AZ', 'Both', 'Yes', 'Yes');
+INSERT INTO JOBORDER VALUES('J-1357', 62349, 'VEH1789', 210, '03/11/2018', 'CA-1', 1002, '789 Gold Ave', 'Henderson, NV 89002', 'NV', '5678 Wilshire Blvd', 'Beverly Hills', 'CA', 'Moving Service', 'Yes', 'No');
+INSERT INTO JOBORDER VALUES('J-2460', 48197, 'VEH2815', 211, '01/19/2021', 'NV-1', 1120, '222 Second Ave', 'Bellevue', 'WA', '2468 Diamond Rd', 'North Las Vegas', 'NV', 'Storage Service', 'No', 'Yes');
+INSERT INTO JOBORDER VALUES('J-1234', 75923, 'VEH3970', 212, '10/08/2017', 'AZ-1', 1255, '9101 Oak St', 'San Diego', 'CA', '9101 Pine Ave', 'Mesa', 'AZ', 'Both', 'No', 'Yes');
+INSERT INTO JOBORDER VALUES('J-8765', 38957, 'VEH4945', 213, '04/23/2022', 'CA-1', 1367, '1010 Diamond Dr', 'Carson City', 'NV', '9101 Sunset Blvd', 'West Hollywood', 'CA', 'Moving Service', 'Yes', 'No');
+INSERT INTO JOBORDER VALUES('J-4321', 92754, 'VEH5987', 214, '07/08/2016', 'NV-1', 1422, '1212 Elm St', 'Santa Barbara', 'CA', '3690 Copper Cir', 'Sparks', 'NV', 'Storage Service', 'No', 'Yes');
+INSERT INTO JOBORDER VALUES('J-8024', 57219, 'VEH5987', 215, '11/29/2020', 'AZ-1', 1550, '1212 Platinum Ave', 'Sparks', 'NV', '2468 Oak Blvd', 'Scottsdale', 'AZ', 'Both', 'No', 'Yes');
+
+
+
+
+
+
+/*********  JOBSTATUS DATA   ***************************************************************/
+
+INSERT INTO JOBSTATUS (StatusID, StatusName)
+	VALUES(101, 'In Progress');
+INSERT INTO JOBSTATUS VALUES(205, 'Complete');
+INSERT INTO JOBSTATUS VALUES(312, 'Rescheduled');
+INSERT INTO JOBSTATUS VALUES(422, 'Canceled');
+INSERT INTO JOBSTATUS VALUES(507, 'Pending');
+INSERT INTO JOBSTATUS VALUES(613, 'On Hold');
+INSERT INTO JOBSTATUS VALUES(723, 'In Progress');
+INSERT INTO JOBSTATUS VALUES(801, 'Complete');
+INSERT INTO JOBSTATUS VALUES(916, 'Rescheduled');
+INSERT INTO JOBSTATUS VALUES(1002, 'Canceled');
+INSERT INTO JOBSTATUS VALUES(1120, 'Pending');
+INSERT INTO JOBSTATUS VALUES(1255, 'On Hold');
+INSERT INTO JOBSTATUS VALUES(1367, 'In Progress');
+INSERT INTO JOBSTATUS VALUES(1422, 'Complete');
+INSERT INTO JOBSTATUS VALUES(1550, 'Rescheduled');
+
+/*********  VEHICLE DATA   ***************************************************************/
+
+INSERT INTO VEHICLE (VehicleID, VehicleTypeID)
+	VALUES('VEH1057', 'VAN-001');
+INSERT INTO VEHICLE VALUES('VEH2096', 'TRK-002');
+INSERT INTO VEHICLE VALUES('VEH3145','SUV-003');
+INSERT INTO VEHICLE VALUES('VEH4163', 'VAN-004');
+INSERT INTO VEHICLE VALUES('VEH5218', 'TRK-005');
+INSERT INTO VEHICLE VALUES('VEH6372', 'SUV-006');
+INSERT INTO VEHICLE VALUES('VEH7458', 'TRK-007');
+INSERT INTO VEHICLE VALUES('VEH8489', 'TRK-008');
+INSERT INTO VEHICLE VALUES('VEH9510', 'VAN-009');
+INSERT INTO VEHICLE VALUES('VEH0621', 'VAN-010');
+INSERT INTO VEHICLE VALUES('VEH1789', 'TRK-011');
+INSERT INTO VEHICLE VALUES('VEH2815', 'VAN-012');
+INSERT INTO VEHICLE VALUES('VEH3970', 'TRK-013');
+INSERT INTO VEHICLE VALUES('VEH4945', 'TRK-014');
+INSERT INTO VEHICLE VALUES('VEH5987', 'TRK-015');
+
+
+/*********  VEHICLETYPE DATA   ***************************************************************/
+
+INSERT INTO VEHICLETYPE (VehiclyTypeID, LicensePlate, Axles, Color, Stored)
+	VALUES('VAN-001', 'F3T2X8R', 2, 'Red', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('TRK-002', 'H6N9S4Z', 3, 'Blue', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('SUV-003', 'J2E4M7D', 2, 'Black', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('VAN-004', 'L8P1T3G', 4, 'Silver', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('TRK-005', 'N5B2F8K', 3, 'White', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('VAN-006', 'E9P2N7S', 2, 'Teal', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('TRK-007', 'Q1U6Z9V', 2, 'Gray', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('TRK-008', 'R4J7E2K', 5, 'Green', 'No');
+INSERT INTO VEHICLETYPE VALUES('VAN-009', 'T9G5N1D', 4, 'Yellow', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('VAN-010', 'V2H8Q6T', 2, 'Orange', 'No');
+INSERT INTO VEHICLETYPE VALUES('TRK-011', 'X5W7F4M', 6, 'Purple', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('VAN-012', 'Y8D2P6K', 3, 'Brown', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('TRK-013', 'Z1T7R8J', 4, 'Beige', 'Yes');
+INSERT INTO VEHICLETYPE VALUES('TRK-014', 'A5B2F9D', 2, 'Gold', 'No');
+INSERT INTO VEHICLETYPE VALUES('TRK-015', 'C7J3K5L', 3, 'Maroon', 'Yes');
+
+
+/*********  FEES DATA   ***************************************************************/
+
+INSERT INTO FEES (FeeID, JobOrderID, FeeDescription, FeeAmount)
+	VALUES('FEE00123', 'J-98765', 'Packing supplies', '$100');
+INSERT INTO FEES VALUES('FEE00234', 'J-54321', 'Transportation costs', '$2.50');
+INSERT INTO FEES VALUES('FEE00345', 'J-24680', 'Transportation costs', '$5');
+INSERT INTO FEES VALUES('FEE00456', 'J-13579', 'Security deposit', '$100');
+INSERT INTO FEES VALUES('FEE00567', 'J-24601', 'Application fee', '$25');
+INSERT INTO FEES VALUES('FEE00678', 'J-12345', 'Labor cost', '$50');
+INSERT INTO FEES VALUES('FEE00789', 'J-9876', 'Packing supplies', '$200');
+INSERT INTO FEES VALUES('FEE00890', 'J-5432', 'Packing supplies', '$300');
+INSERT INTO FEES VALUES('FEE00901', 'J-2468', 'Transportation costs', '$7.50');
+INSERT INTO FEES VALUES('FEE01012', 'J-1357', 'Security deposit', '$1000');
+INSERT INTO FEES VALUES('FEE01123', 'J-2460', 'Application fee', '$50');
+INSERT INTO FEES VALUES('FEE01234', 'J-1234', 'Labor cost', '$200');
+INSERT INTO FEES VALUES('FEE01345', 'J-8765', 'Packing supplies', '$100');
+INSERT INTO FEES VALUES('FEE01456', 'J-4321', 'Labor cost', '$500');
+INSERT INTO FEES VALUES('FEE01567', 'J-8024', 'Transportation costs', '$10');
+
+/*********  RENTAL DATA   ***************************************************************/
+
+INSERT INTO RENTAL (RentalID, CustomerID, WarehouseID, UnitID, StartDate, EndDate)
+	VALUES('RNTL001', '87002', 'CA-1', '1', '08/12/2017', '08/19/2017');
+INSERT INTO RENTAL VALUES('RNTL002', '24601', 'NV-1', '1', '01/23/2019', '01/30/2019');
+INSERT INTO RENTAL VALUES('RNTL003', '93752', 'AZ-1', '1', '03/07/2018', '03/14/2018');
+INSERT INTO RENTAL VALUES('RNTL004', '18594', 'CA-1', '2', '06/02/2020', '06/09/2020');
+INSERT INTO RENTAL VALUES('RNTL005', '71985', 'NV-1', '2', '10/11/2016', '10/18/2016');
+INSERT INTO RENTAL VALUES('RNTL006', '37281', 'AZ-1', '2', '12/05/2019', '12/12/2019');
+INSERT INTO RENTAL VALUES('RNTL007', '68543', 'CA-1', '3', '05/17/2021', '05/24/2021');
+INSERT INTO RENTAL VALUES('RNTL008', '25714', 'NV-1', '3', '02/28/2018', '03/07/2018');
+INSERT INTO RENTAL VALUES('RNTL009', '89372', 'AZ-1', '3', '09/14/2017', '09/21/2017');
+INSERT INTO RENTAL VALUES('RNTL010', '62349', 'CA-1', '4', '11/06/2022', '11/13/2022');
+INSERT INTO RENTAL VALUES('RNTL011', '48197', 'NV-1', '4', '07/19/2021', '07/26/2021');
+INSERT INTO RENTAL VALUES('RNTL012', '75923', 'AZ-1', '4', '04/08/2016', '04/15/2016');
+INSERT INTO RENTAL VALUES('RNTL013', '38957', 'CA-1', '5', '02/11/2020', '02/18/2020');
+INSERT INTO RENTAL VALUES('RNTL014', '92754', 'NV-1', '5', '08/23/2018', '08/30/2018');
+INSERT INTO RENTAL VALUES('RNTL015', '57219', 'AZ-1', '5', '11/01/2022', '11/08/2022');
+
+
+/*********  INVOICE DATA   ***************************************************************/
+
+INSERT INTO INVOICE (InvoiceID, JobOrderID, TotalCost)
+	VALUES('INV2378', 'J-98765', '750.00');
+INSERT INTO INVOICE VALUES('INV5032', 'J-54321', '1200.00');
+INSERT INTO INVOICE VALUES('INV9087', 'J-24680', '900.50');
+INSERT INTO INVOICE VALUES('INV1564', 'J-13579', '2500.00');
+INSERT INTO INVOICE VALUES('INV8023', 'J-24601', '1750.00');
+INSERT INTO INVOICE VALUES('INV3412', 'J-12345', '3000.25');
+INSERT INTO INVOICE VALUES('INV6790', 'J-9876', '800.75');
+INSERT INTO INVOICE VALUES('INV4201', 'J-5432', '1500.00');
+INSERT INTO INVOICE VALUES('INV7259', 'J-2468', '2100.50');
+INSERT INTO INVOICE VALUES('INV8893', 'J-1357', '1250.25');
+INSERT INTO INVOICE VALUES('INV1115', 'J-2460', '1250.25');
+INSERT INTO INVOICE VALUES('INV6743', 'J-1234', '1750.50');
+INSERT INTO INVOICE VALUES('INV2506', 'J-8765', '950.00');
+INSERT INTO INVOICE VALUES('INV8075', 'J-4321', '2800.75');
+INSERT INTO INVOICE VALUES('INV9932', 'J-8024', '2200.50');
+
+/*********  PAYMENT DATA   ***************************************************************/
+
+INSERT INTO PAYMENT (PaymentID, InvoiceID, DatePaid, AmountPaid)
+	VALUES('PAY001', 'INV2378', '07/12/2018', '750.00');
+INSERT INTO PAYMENT VALUES('PAY002', 'INV5032', '02/23/2019', '1000.00');
+INSERT INTO PAYMENT VALUES('PAY003', 'INV9087', '09/15/2022', '900.50');
+INSERT INTO PAYMENT VALUES('PAY004', 'INV1564', '12/30/2016', '2000.00');
+INSERT INTO PAYMENT VALUES('PAY005', 'INV8023', '03/18/2017', '1750.00');
+INSERT INTO PAYMENT VALUES('PAY006', 'INV3412', '06/29/2020', '3000.25');
+INSERT INTO PAYMENT VALUES('PAY007', 'INV6790', '11/05/2019', '800.75');
+INSERT INTO PAYMENT VALUES('PAY008', 'INV4201', '01/08/2023', '1000.00');
+INSERT INTO PAYMENT VALUES('PAY009', 'INV7259', '08/22/2016', '2000.50');
+INSERT INTO PAYMENT VALUES('PAY010', 'INV8893', '05/11/2021', '1850.00');
+INSERT INTO PAYMENT VALUES('PAY011', 'INV1115', '10/01/2018', '1250.25');
+INSERT INTO PAYMENT VALUES('PAY012', 'INV6743', '04/26/2022', '1750.50');
+INSERT INTO PAYMENT VALUES('PAY013', 'INV2506', '08/09/2017', '900.00');
+INSERT INTO PAYMENT VALUES('PAY014', 'INV8075', '11/19/2021', '2800.75');
+INSERT INTO PAYMENT VALUES('PAY015', 'INV9932', '06/02/2019', '2200.50');
