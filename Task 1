@@ -1,0 +1,402 @@
+/************************QUESTIONS A AND B*********************************/
+
+USE QACS;
+
+CREATE TABLE CUSTOMER ( 
+	CustomerID Int IDENTITY(1,1) NOT NULL,
+	LastName Char(50) NOT NULL,
+	FirstName Char(50) NOT NULL,
+	CustomerAddress Char(100) NOT NULL,
+	City Char(60) NOT NULL,
+	State Char(2) NOT NULL,
+	ZIP Int NOT NULL,
+	Phone Char(20) NOT NULL,
+	EmailAddress Char(100) NOT NULL,
+	CONSTRAINT CUSTOMER_PK PRIMARY KEY(CustomerID)
+	);
+
+CREATE TABLE EMPLOYEE ( 
+	EmployeeID Int IDENTITY(1,1) NOT NULL,
+	LastName Char(50) NOT NULL, 
+	FirstName Char(50) NOT NULL, 
+	Phone Char(20) NOT NULL,
+	EmailAddress Char(100) NOT NULL, 
+	CONSTRAINT EMPLOYEE_PK PRIMARY KEY(EmployeeID)
+	);
+
+CREATE TABLE VENDOR (
+	VendorID Int IDENTITY(1,1) NOT NULL,
+	CompanyName Char(100) NULL, 
+	ContactLastName Char(50) NOT NULL,
+	ContactFirstName Char(50) NOT NULL,
+	VendorAddress Char(100) NOT NULL,
+	City Char(60) NOT NULL,
+	State Char(2) NOT NULL,
+	ZIP Int NOT NULL,
+	Phone Char(20) NOT NULL,
+	Fax Char(12) NULL,
+	EmailAddress Char(100) NOT NULL, 
+	CONSTRAINT VENDOR_PK PRIMARY KEY(VendorID)
+	);
+
+CREATE TABLE ITEM ( 
+	ItemID Int IDENTITY(1,1) NOT NULL,
+	ItemDescription Char(100) NOT NULL, 
+	PurchaseDate Date NOT NULL,
+	ItemCost DECIMAL(10,2) NOT NULL,
+	ItemPrice DECIMAL(10,2) NOT NULL,
+	VendorID Int NOT NULL, 
+	CONSTRAINT ITEM_PK PRIMARY KEY(ItemID),
+	CONSTRAINT VEND_VENDORID_FK FOREIGN KEY(VendorID) REFERENCES VENDOR (VendorID)
+	);
+
+CREATE TABLE SALE ( 
+	SaleID Int IDENTITY(1,1) NOT NULL,
+	CustomerID Int NOT NULL, 
+	EmployeeID Int NOT NULL,
+	SaleDate Date NOT NULL, 
+	SubTotal DECIMAL(10,2) NOT NULL,
+	Tax DECIMAL(10,2) NOT NULL,
+	Total DECIMAL(10,2) NOT NULL,
+	CONSTRAINT SALE_PK PRIMARY KEY(SaleID),
+	CONSTRAINT CUST_CUSTOMERID_FK FOREIGN KEY (CustomerID) REFERENCES CUSTOMER (CustomerID),
+	CONSTRAINT EMPL_EMPLOYEEID_FK FOREIGN KEY (EmployeeID) REFERENCES EMPLOYEE (EmployeeID)
+	);
+
+CREATE TABLE SALE_ITEM (
+	SaleID Int NOT NULL,
+	SaleItemID Int IDENTITY(1,1) NOT NULL,
+	ItemId Int NOT NULL,
+	ItemPrice DECIMAL(10,2) NOT NULL,
+	CONSTRAINT SALEITEM_PK PRIMARY KEY(SaleItemID),
+	CONSTRAINT ITEM_ITEMID_FK FOREIGN KEY (ItemID) REFERENCES ITEM (ItemID),
+	CONSTRAINT SALE_SALEID_FK FOREIGN KEY (SaleID) REFERENCES SALE (SaleID)
+	);
+
+/***************************QUESTION C***********************************/
+
+USE QACS;
+
+/*****   CUSTOMER DATA   ******************************************************/
+
+INSERT INTO CUSTOMER (LastName, FirstName, CustomerAddress, City, State, ZIP, Phone, EmailAddress)
+	VALUES('Shire', 'Robert', '6225 Evanston Ave N', 'Seattle', 'WA', '98103', '206-524-2433', 'Robert.Shire@somewhere.com');
+INSERT INTO CUSTOMER VALUES ('Goodyear', 'Katherine', '7335 11th Ave NE', 'Seattle', 'WA', '98105', '206-524-3544', 'Katherine.Goodyear@somewhere.com');
+INSERT INTO CUSTOMER VALUES ('Bancroft', 'Chris', '12605 NE 6th Street', 'Bellevue', 'WA', '98005', '425-635-9788', 'Chris.Bancroft@somewhere.com');
+INSERT INTO CUSTOMER VALUES ('Griffith', 'John', '335 Aloha Street', 'Seattle', 'WA', '98109', '206-524-4655', 'John.Griffith@somewhere.com');
+INSERT INTO CUSTOMER VALUES ('Tiemey', 'Doris', '14510 NE 4th Street', 'Bellevue', 'WA', '98005', '425-635-8677', 'Doris.Tiemey@somewhere.com');
+INSERT INTO CUSTOMER VALUES ('Anderson', 'Donna', '1410 Hillcrest Parkway', 'Mt. Venom', 'WA', '98273', '360-538-7566', 'Donna.Anderson@elsewhere.com');
+INSERT INTO CUSTOMER VALUES ('Svane', 'Jack', '3211 42nd Street', 'Seattle', 'WA', '98115', '206-524-5766', 'Jack.Svane@somewhere.com');
+INSERT INTO CUSTOMER VALUES ('Walsh', 'Denesha', '6712 24th Avenue NE', 'Redmond', 'WA', '98053', '425-635-7566', 'Denesha.Walsh@somewhere.com');
+INSERT INTO CUSTOMER VALUES ('Enquist', 'Craig', '534 15th Street', 'Bellingham', 'WA', '98225', '360-538-6455', 'Craig.Enquist@elsewhere.com');
+INSERT INTO CUSTOMER VALUES ('Anderson', 'Rose', '6823 17th Ave NE', 'Seattle', 'WA', '98105', '206-524-6877', 'Rose.Anderson@elsewhere.com');
+
+
+
+
+/*****  EMOLOYEE DATA ***************************************************/
+
+INSERT INTO EMPLOYEE (LastName, FirstName, Phone, EmailAddress) 
+	VALUES('Stuart', 'Anne', '206-527-0010', 'Anne.Stuart@QACS.com');
+INSERT INTO EMPLOYEE VALUES('Stuart', 'George', '206-527-0011', 'George.Stuart@QACS.com'); 
+INSERT INTO EMPLOYEE VALUES('Stuart', 'Mary', '206-527-0012', 'Mary.Stuart@QACS.com');
+INSERT INTO EMPLOYEE VALUES('Orange', 'William', '206-527-0013', 'William.Orange@QACS.com');
+INSERT INTO EMPLOYEE VALUES('Griffith', 'John', '206-527-0014', 'John.Griffith@QACS.com');
+
+
+	
+/*****   VENDOR DATA ****************************************************/
+
+
+INSERT INTO VENDOR (CompanyName, ContactLastName, ContactFirstName, VendorAddress, City, State, ZIP, Phone, Fax, EmailAddress)	
+	VALUES('Linens and Things', 'Huntington', 'Anne', '1515 NW Market Street', 'Seattle', 'WA', '98107', '206-325-6755', '206-329-9675', 'LAT@business.com');
+INSERT INTO VENDOR VALUES('European Specialties', 'Tadema', 'Ken', '6123 15th Avenue NW', 'Seattle', 'WA', '98107', '206-325-7866', '206-329-9786', 'ES@@business.com');
+INSERT INTO VENDOR VALUES('Lamps and Lighting', 'Swanson', 'Sally', '506 Prospect Street', 'Seattle', 'WA', '98109', '206-325-8977', '206-329-9897', 'LAL@businews.com');
+INSERT INTO VENDOR VALUES('NULL', 'Lee', 'Andrew', '1102 3rd Street', 'Kirkland', 'WA', '98033', '425-746-5433', 'NULL', 'Andrew.Lee@somewhere.com');
+INSERT INTO VENDOR VALUES('NULL', 'Harrison', 'Denise', '533 10th Avenue', 'Kirkland', 'WA', '98033', '425-746-4322', 'NULL', 'Denise.Harrison@somewhere.com');
+INSERT INTO VENDOR VALUES('New York Brokerage', 'Smith', 'Mark', '621 Roy Street', 'Seattle', 'WA', '98109', '206-325-9088', '206-329-9908', 'NYB@business.com');
+INSERT INTO VENDOR VALUES('NULL', 'Walsh', 'Denesha', '6712 24th Avenue NE', 'Redmond', 'WA', '98053', '425-635-7566', 'NULL', 'Denesha.Walsh@somewhere.com');
+INSERT INTO VENDOR VALUES('NULL', 'Bancroft', 'Chris', '12605 NE 6th Street', 'Bellevue', 'WA', '98005', '425-635-9788', '425-639-9978', 'Chris.Bancroft@somewhere.com');
+INSERT INTO VENDOR VALUES('Specialty Antiques', 'Nelson', 'Fred', '2512 Lucky Street', 'San Francisco', 'CA', '94110', '415-422-2121', '425-639-9978', 'SA@business.com');
+INSERT INTO VENDOR VALUES('General Antiques', 'Garner', 'Patty', '2515 Lucky Street', 'San Francisco', 'CA', '94110', '415-422-3232', '415-423-5212', 'GA@business.com');
+
+	
+/*****   ITEM DATA   ******************************************************/
+
+INSERT INTO ITEM (ItemDescription, PurchaseDate, ItemCost, ItemPrice, VendorID) 
+	VALUES('Antique Desk', '2018-11-07', '1800', '3000', '2');
+INSERT INTO ITEM VALUES('Antique Desk Chair', '2018-11-10', '300', '500', '4'); 
+INSERT INTO ITEM VALUES('Dining Table Linens', '2018-11-14', '600', '1000', '1');
+INSERT INTO ITEM VALUES('Candles', '2018-11-14', '30', '50', '1'); 
+INSERT INTO ITEM VALUES('Candles', '2018-11-14', '27', '45', '1');
+INSERT INTO ITEM VALUES('Desk Lamp', '2018-11-14', '150', '250', '3');
+INSERT INTO ITEM VALUES('Dining Table Linens', '2018-11-14', '450', '750', '1');
+INSERT INTO ITEM VALUES('Book Shelf', '2018-11-21', '150', '250', '5'); 
+INSERT INTO ITEM VALUES('Antique Chair', '2018-11-21', '750', '1250', '6');
+INSERT INTO ITEM VALUES('Antique Chair', '2018-11-21', '1050', '1750', '6');
+INSERT INTO ITEM VALUES('Antique Candle Holders', '2018-11-28', '210', '350', '2');
+INSERT INTO ITEM VALUES('Antique Desk', '2019-01-05', '1920', '3200', '2');
+INSERT INTO ITEM VALUES('Antique Desk', '2019-01-06', '2100', '3500', '2');
+INSERT INTO ITEM VALUES('Antique Desk Chair', '2019-01-06', '285', '475', '9');
+INSERT INTO ITEM VALUES('Antique Desk Chair', '2019-01-06', '339', '565', '9');
+INSERT INTO ITEM VALUES('Desk Lamp', '2019-01-06', '150', '250', '10');
+INSERT INTO ITEM VALUES('Desk Lamp', '2019-01-06', '150', '250', '10');
+INSERT INTO ITEM VALUES('Desk Lamp', '2019-01-06', '144', '240', '3');
+INSERT INTO ITEM VALUES('Antique Dining Table', '2019-01-10', '3000', '5000', '7');
+INSERT INTO ITEM VALUES('Antique Sideboard', '2019-01-11', '2700', '4500', '8');
+INSERT INTO ITEM VALUES('Dining Table Chairs', '2019-01-11', '5100', '8500', '9');
+INSERT INTO ITEM VALUES('Dining Table Linens', '2019-01-12', '450', '800', '1');
+INSERT INTO ITEM VALUES('Dining Table Linens', '2019-01-12', '480', '800', '1');
+INSERT INTO ITEM VALUES('Candles', '2019-01-17', '30', '50', '1');
+INSERT INTO ITEM VALUES('Candles', '2019-01-17', '36', '60', '1');
+
+
+/********  SALE DATA  **********************************************************/
+
+INSERT INTO SALE (CustomerID, EmployeeID, SaleDate, SubTotal, Tax, Total)
+	VALUES('1', '1', '2018-12-14', '3500', '290.50', '3790.50');
+INSERT INTO SALE VALUES('2', '1', '2018-12-15', '1000', '83', '1083'); 
+INSERT INTO SALE VALUES('3', '1', '2018-12-15', '50', '4.15', '54.15');
+INSERT INTO SALE VALUES('4', '3', '2018-12-15', '50.00', '4.15', '54.15');
+INSERT INTO SALE VALUES('1', '5', '2018-12-23', '45', '3.74', '8.74'); 
+INSERT INTO SALE VALUES('5', '5', '2019-01-10', '750', '62.75', '812.25');
+INSERT INTO SALE VALUES('6', '4', '2019-01-12', '250', '20.75', '270.75');
+INSERT INTO SALE VALUES('2', '1', '2019-01-15', '3000.00', '249', '3249');
+INSERT INTO SALE VALUES('5', '5', '2019-01-25', '350', '29.05', '379.05'); 
+INSERT INTO SALE VALUES('7', '1', '2019-02-04', '14250', '1182.75', '15432.75');
+INSERT INTO SALE VALUES('8', '5', '2019-02-04', '250', '20.75', '270.75');
+INSERT INTO SALE VALUES('5', '4', '2019-02-07', '50', '4.15', '54.15');
+INSERT INTO SALE VALUES('9', '2', '2019-02-07', '4500', '373.50', '4873.50');
+INSERT INTO SALE VALUES('10', '3', '2019-02-11', '3675', '305.03', '3983.03');
+INSERT INTO SALE VALUES('2', '2', '2019-02-11', '800', '66.40', '866.40');
+
+
+
+/******** SALE_ITEM DATA   **********************************************************/
+
+INSERT INTO SALE_ITEM (SaleID, ItemID, ItemPrice)	
+	VALUES('1','1','3000');
+INSERT INTO SALE_ITEM VALUES('1', '2', '500');
+INSERT INTO SALE_ITEM VALUES('2', '3', '1000');
+INSERT INTO SALE_ITEM VALUES('3', '4', '50');
+INSERT INTO SALE_ITEM VALUES('4', '5', '45');
+INSERT INTO SALE_ITEM VALUES('5', '6', '250');
+INSERT INTO SALE_ITEM VALUES('6', '7', '750');
+INSERT INTO SALE_ITEM VALUES('7', '8', '250');
+INSERT INTO SALE_ITEM VALUES('8', '9', '1250');
+INSERT INTO SALE_ITEM VALUES('8', '10', '1750');
+INSERT INTO SALE_ITEM VALUES('9', '11', '350');
+INSERT INTO SALE_ITEM VALUES('10',  '19', '5000');
+INSERT INTO SALE_ITEM VALUES('10','21', '8500');
+INSERT INTO SALE_ITEM VALUES('10', '22', '750');
+INSERT INTO SALE_ITEM VALUES('11','17', '250');
+INSERT INTO SALE_ITEM VALUES('12', '24', '50');
+INSERT INTO SALE_ITEM VALUES('13', '20', '4500');
+INSERT INTO SALE_ITEM VALUES('14', '12', '3200');
+INSERT INTO SALE_ITEM VALUES('14', '14', '475');
+INSERT INTO SALE_ITEM VALUES('15', '23', '800');
+
+/************************QUESTION D***************************************/
+
+USE QACS;
+
+SELECT *
+FROM CUSTOMER;
+
+SELECT *
+FROM EMPLOYEE;
+
+SELECT *
+FROM ITEM;
+
+SELECT *
+FROM SALE;
+
+SELECT *
+FROM SALE_ITEM;
+
+SELECT *
+FROM VENDOR;
+
+/************************QUESTION E**********************************/
+
+USE QACS;
+
+SELECT ItemID, ItemDescription 
+FROM ITEM 
+WHERE ItemCost >= 1000
+
+/*************************QUESTION F*************************************/
+
+USE QACS;
+
+SELECT ItemID, ItemDescription 
+FROM ITEM inner join VENDOR on Item.VendorID=Vendor.VendorID
+WHERE ItemCost >= 1000 and CompanyName like 'New%';
+
+/**********************QUESTION G*************************************/
+
+USE QACS;
+
+SELECT LastName, FirstName, Phone
+FROM CUSTOMER
+WHERE CUSTOMERID IN 
+	  (SELECT CustomerID
+	  FROM SALE 
+	  WHERE SaleID = 1);
+
+/***************************QUESTION H************************************/
+
+USE QACS;
+
+SELECT LastName, FirstName, Phone
+FROM CUSTOMER AS C JOIN SALE AS S
+		  ON	C.CustomerID=S.CustomerID
+WHERE SaleID in (1);
+
+/**************************QUESTION I**************************************/
+
+USE QACS;
+
+SELECT LastName, FirstName, Phone
+FROM CUSTOMER
+WHERE CUSTOMERID IN 
+	  (SELECT CustomerID
+	  FROM SALE 
+	  WHERE SaleID IN (1,2,3));
+
+/************************QUESTION J*****************************/
+
+USE QACS;
+
+SELECT LastName, FirstName, Phone
+FROM CUSTOMER AS C JOIN SALE AS S
+		  ON	C.CustomerID=S.CustomerID
+WHERE SaleID in (1,2,3);
+
+/********************************QUESTION K*****************************/
+
+USE QACS;
+
+SELECT LastName, FirstName, Phone
+FROM CUSTOMER
+WHERE CUSTOMERID IN 
+	  (SELECT CustomerID
+	  FROM SALE 
+	  WHERE SubTotal>500);
+
+/***************************QUESTION L*******************************/
+
+USE QACS;
+
+SELECT DISTINCT LastName, FirstName, Phone
+FROM CUSTOMER AS C JOIN SALE AS S 
+		ON C.CustomerID=S.CustomerID
+WHERE SubTotal>500;
+
+/******************************QUESTION M********************************/
+
+USE QACS;
+
+SELECT LastName, FirstName, Phone
+FROM CUSTOMER
+WHERE CUSTOMERID IN 
+	  (SELECT CustomerID
+	  FROM SALE 
+	  WHERE SaleID IN
+	  (SELECT SaleID
+	  FROM SALE_ITEM
+	  WHERE ItemPrice=500));
+
+/***************************QUESTION N*********************************/
+
+USE QACS;
+
+SELECT DISTINCT LastName, FirstName, Phone
+FROM CUSTOMER AS C JOIN SALE AS S
+	ON C.CustomerID=S.CustomerID	
+	JOIN SALE_ITEM as SI
+	ON S.SaleID=SI.SaleID
+WHERE ItemPrice=500;
+
+/*****************************QUESTION O************************************/
+
+USE QACS;
+
+SELECT LastName, FirstName, Phone
+FROM CUSTOMER
+WHERE CUSTOMERID IN 
+	(SELECT CustomerID
+	FROM SALE
+	WHERE SaleID IN
+	(SELECT SaleID
+	FROM SALE_ITEM
+	WHERE ItemID IN
+	(SELECT ItemID
+	FROM ITEM
+	WHERE VendorID IN 
+	(SELECT VendorID
+	FROM VENDOR 
+	WHERE CompanyName LIKE 'L%'))));
+
+/********************************QUESTION P*******************************/
+
+USE QACS;
+
+SELECT DISTINCT LastName, FirstName, C.Phone
+FROM CUSTOMER AS C JOIN SALE AS S
+	ON C.CustomerID=S.CustomerID
+	JOIN SALE_ITEM AS SI
+	ON S.SaleID=SI.SaleID
+	JOIN ITEM AS I
+	ON SI.ItemID=I.ItemID
+	JOIN VENDOR AS V
+	ON I.VendorID=V.VendorID
+WHERE CompanyName LIKE 'L%';
+
+/*****************************QUESTION Q******************************/
+
+USE QACS;
+
+SELECT C.CustomerID, LastName, FirstName, Phone, SUM(SubTotal) AS SumOfSubTotal
+FROM CUSTOMER AS C
+		JOIN SALE AS S
+		ON C.CustomerID = S.CustomerID
+GROUP BY C.CustomerID, LastName, FirstName, Phone 
+ORDER BY CustomerID DESC; 
+
+/********************************QUESTION R*******************************/ 
+
+USE QACS;
+
+/* ***SQL-QACS*** */
+SELECT CompanyName
+FROM VENDOR;
+
+/* ***SQL-UPDATE-QACS*** */
+UPDATE VENDOR
+SET CompanyName = 'Linens and Things'
+WHERE CompanyName = 'Linens and Other Stuff';
+
+/****************************QUESTION S*********************************/
+
+SELECT CompanyName
+FROM VENDOR;
+
+/* ***SQL-UPDATE-QACS*** */
+UPDATE VENDOR
+SET CompanyName = 'Linens and Things'
+WHERE CompanyName = 'Lamps and Lighting';
+/* ***SQL-UPDATE-QACS*** */
+UPDATE VENDOR 
+SET CompanyName = 'Lamps and Lighting'
+WHERE CompanyName = 'Linens and Things';
+
+/****************************QUESTION T***********************************/
+
+USE QACS;
+
+SET FOREIGN_KEY_CHECKS = 0; 
+SELECT FROM CUSTOMER, EMPLOYEE, ITEM, SALE, VENDOR; 
+TRUNCATE table CUSTOMER, EMPLOYEE, ITEM, SALE, VENDOR; 
+SET FOREIGN_KEY_CHECKS = 1;
